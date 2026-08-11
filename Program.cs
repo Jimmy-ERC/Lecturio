@@ -1,7 +1,12 @@
+using Lecturio.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<SupabaseOptions>(
+    builder.Configuration.GetSection(SupabaseOptions.SectionName));
 
 var app = builder.Build();
 
