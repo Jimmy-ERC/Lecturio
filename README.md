@@ -14,18 +14,19 @@ Plataforma web académica para la gestión, lectura y compartición de libros en
 
 - **ASP.NET** — framework de desarrollo backend bajo arquitectura MVC.
 - **Bootstrap** — diseño e interfaz de usuario.
-- **Supabase** — base de datos y almacenamiento de archivos PDF.
+- **Supabase** — base de datos, autenticación (Supabase Auth) y almacenamiento de archivos (bucket `libros-pdf` para PDFs y bucket `portadas` para miniaturas de portada).
 
 ## Modelo de datos
 
-El sistema se apoya en cinco tablas principales:
+El sistema se apoya en seis tablas principales:
 
 | Tabla | Descripción |
 |---|---|
+| Usuarios | Perfil de cada usuario registrado, referenciando la identidad gestionada por Supabase Auth. |
 | Libros | Información de cada libro: título, autor, archivo PDF, portada y estado de lectura. |
 | Géneros | Catálogo de géneros literarios, mostrados como etiquetas asociadas a cada libro. |
-| Usuarios | Datos de las personas registradas, usados para el registro e inicio de sesión. |
 | Presentación | Catálogo de formatos o tipos de presentación del libro (novela, cuento, cómic, etc.), mostrados como etiquetas. |
+| Libros_Géneros | Tabla intermedia que relaciona un libro con uno o varios géneros. |
 | Compartidos | Registro de qué libros han sido compartidos, por quién y con quién. |
 
 ## Creadores
