@@ -1,0 +1,58 @@
+@model Lecturio.Models.Auth.RegisterViewModel
+@{
+    ViewData["Title"] = "Crear cuenta";
+    Layout = "_AuthLayout";
+}
+
+<h2 class="auth-title">Crea tu cuenta en Lecturio</h2>
+
+<form asp-controller="Auth" asp-action="Register" method="post" novalidate>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" placeholder="Tu nombre" autocomplete="name" />
+        <span asp-validation-for="Nombre" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" placeholder="jimmy@gmail.com" autocomplete="email" />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <div class="auth-password-field">
+            <input asp-for="Password" class="form-control" placeholder="Mínimo 6 caracteres" autocomplete="new-password" id="passwordInput" />
+            <button type="button" class="auth-password-toggle" id="togglePassword" aria-label="Mostrar contraseña">👁</button>
+        </div>
+        <span asp-validation-for="Password" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <input asp-for="ConfirmPassword" class="form-control" placeholder="Repite tu contraseña" autocomplete="new-password" type="password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+    </div>
+
+    <button type="submit" class="btn btn-brand w-100 py-2">Crear cuenta</button>
+
+    <p class="text-center mt-3 mb-0">
+        ¿Ya tienes cuenta? <a asp-controller="Auth" asp-action="Login">Inicia sesión</a>
+    </p>
+
+    <p class="text-center text-muted small mt-3 mb-0">
+        Después de crear tu cuenta te enviaremos un correo de confirmación. Debes abrirlo y confirmarlo antes de poder iniciar sesión.
+    </p>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('togglePassword')?.addEventListener('click', function () {
+            const input = document.getElementById('passwordInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        });
+    </script>
+}

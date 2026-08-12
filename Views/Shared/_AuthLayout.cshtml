@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Lecturio</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-visual">
+            <div class="auth-visual-content">
+                <div class="auth-visual-icon">📚</div>
+                <h1>Lecturio</h1>
+                <p>Sube, lee en línea y comparte tus libros favoritos con otros lectores.</p>
+            </div>
+        </div>
+        <div class="auth-form-panel">
+            <div class="auth-form-container">
+                <div class="auth-brand">
+                    <span>📚</span>
+                    <span>Lecturio</span>
+                </div>
+                @RenderBody()
+                <div class="auth-footer">&copy; @DateTime.Now.Year Lecturio</div>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

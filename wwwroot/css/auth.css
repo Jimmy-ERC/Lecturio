@@ -1,0 +1,107 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+}
+
+.auth-visual {
+  display: none;
+  flex: 1 1 50%;
+  background: linear-gradient(160deg, #2b1a1f 0%, #4a1620 55%, #7a1f2b 100%);
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.auth-visual-content {
+  max-width: 380px;
+  text-align: center;
+}
+
+.auth-visual-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.auth-visual-content h1 {
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.auth-visual-content p {
+  opacity: 0.85;
+}
+
+.auth-form-panel {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  background: #fff;
+}
+
+.auth-form-container {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.auth-title {
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.auth-password-field {
+  position: relative;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.btn-brand {
+  background-color: #b3122a;
+  border-color: #b3122a;
+  color: #fff;
+}
+
+.btn-brand:hover,
+.btn-brand:focus {
+  background-color: #931022;
+  border-color: #931022;
+  color: #fff;
+}
+
+.auth-footer {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .auth-visual {
+    display: flex;
+  }
+}
+
+.validation-summary-valid {
+  display: none;
+}
