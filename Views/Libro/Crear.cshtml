@@ -1,0 +1,55 @@
+@model Lecturio.Models.Libros.CrearLibroViewModel
+@{
+    ViewData["Title"] = "Agregar libro";
+}
+
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+
+<div class="form-card">
+    <h1>Agregar libro</h1>
+
+    <form asp-controller="Libro" asp-action="Crear" method="post" enctype="multipart/form-data" novalidate>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="Titulo" class="form-label"></label>
+            <input asp-for="Titulo" class="form-control" placeholder="Título del libro" />
+            <span asp-validation-for="Titulo" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Autor" class="form-label"></label>
+            <input asp-for="Autor" class="form-control" placeholder="Autor (opcional)" />
+            <span asp-validation-for="Autor" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="GeneroIds" class="form-label"></label>
+            <select asp-for="GeneroIds" asp-items="Model.GenerosDisponibles" class="form-select" multiple size="6"></select>
+            <div class="form-text">Mantén Ctrl (o Cmd) presionado para seleccionar varios géneros.</div>
+            <span asp-validation-for="GeneroIds" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Pdf" class="form-label"></label>
+            <input asp-for="Pdf" type="file" class="form-control" accept="application/pdf" />
+            <span asp-validation-for="Pdf" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Portada" class="form-label"></label>
+            <input asp-for="Portada" type="file" class="form-control" accept="image/png,image/jpeg,image/webp" />
+            <div class="form-text">Opcional. JPG, PNG o WEBP.</div>
+            <span asp-validation-for="Portada" class="text-danger small"></span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-brand px-4">Guardar libro</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

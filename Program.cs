@@ -4,6 +4,7 @@ using Lecturio.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,9 @@ builder.Services.Configure<SupabaseOptions>(
 builder.Services.AddDbContext<LecturioDbContext>((sp, options) =>
 {
     var supabaseOptions = sp.GetRequiredService<IOptions<SupabaseOptions>>().Value;
-    options.UseNpgsql(supabaseOptions.GetNpgsqlConnectionString());
+    options.UseNpgsql(
+        supabaseOptions.GetNpgsqlConnectionString(),
+        npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(15), errorCodesToAdd: null));
 });
 
 builder.Services.AddHttpClient<ISupabaseAuthService, SupabaseAuthService>((sp, client) =>
@@ -24,6 +27,14 @@ builder.Services.AddHttpClient<ISupabaseAuthService, SupabaseAuthService>((sp, c
     var supabaseOptions = sp.GetRequiredService<IOptions<SupabaseOptions>>().Value;
     client.BaseAddress = new Uri($"{supabaseOptions.Url.TrimEnd('/')}/auth/v1/");
     client.DefaultRequestHeaders.Add("apikey", supabaseOptions.AnonKey);
+});
+
+builder.Services.AddHttpClient<ISupabaseStorageService, SupabaseStorageService>((sp, client) =>
+{
+    var supabaseOptions = sp.GetRequiredService<IOptions<SupabaseOptions>>().Value;
+    client.BaseAddress = new Uri($"{supabaseOptions.Url.TrimEnd('/')}/storage/v1/");
+    client.DefaultRequestHeaders.Add("apikey", supabaseOptions.ServiceRoleKey);
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", supabaseOptions.ServiceRoleKey);
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
