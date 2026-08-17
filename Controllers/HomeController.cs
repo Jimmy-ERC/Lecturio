@@ -22,21 +22,67 @@ namespace Lecturio.Controllers
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
+            var progresos = await db.ProgresosLectura
+                .Where(p => p.UsuarioId == usuarioId)
+                .ToDictionaryAsync(p => p.LibroId);
+
             var resumenes = new List<LibroResumenViewModel>(libros.Count);
             foreach (var libro in libros)
             {
+                progresos.TryGetValue(libro.Id, out var progreso);
+
                 resumenes.Add(new LibroResumenViewModel
                 {
                     Id = libro.Id,
                     Titulo = libro.Titulo,
                     Autor = libro.Autor,
-                    Estado = libro.Estado,
-                    Progreso = libro.TotalPaginas is > 0
-                        ? Math.Clamp((int)Math.Round(libro.PaginaActual * 100.0 / libro.TotalPaginas.Value), 0, 100)
+                    Estado = progreso?.Estado ?? EstadoLibro.SinLeer,
+                    Progreso = progreso?.TotalPaginas is > 0
+                        ? Math.Clamp((int)Math.Round(progreso.PaginaActual * 100.0 / progreso.TotalPaginas.Value), 0, 100)
                         : 0,
                     PortadaUrl = libro.PortadaUrl is null
                         ? null
                         : await storageService.GetPortadaUrlAsync(libro.PortadaUrl),
+                });
+            }
+
+            return View(resumenes);
+        }
+
+        public async Task<IActionResult> Compartidos()
+        {
+            var usuarioId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var compartidos = await db.Compartidos
+                .Where(c => c.CompartidoCon == usuarioId)
+                .Include(c => c.Libro)
+                .Include(c => c.UsuarioQueComparte)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+
+            var libroIds = compartidos.Select(c => c.LibroId).ToList();
+            var progresos = await db.ProgresosLectura
+                .Where(p => p.UsuarioId == usuarioId && libroIds.Contains(p.LibroId))
+                .ToDictionaryAsync(p => p.LibroId);
+
+            var resumenes = new List<LibroResumenViewModel>(compartidos.Count);
+            foreach (var compartido in compartidos)
+            {
+                progresos.TryGetValue(compartido.LibroId, out var progreso);
+
+                resumenes.Add(new LibroResumenViewModel
+                {
+                    Id = compartido.Libro.Id,
+                    Titulo = compartido.Libro.Titulo,
+                    Autor = compartido.Libro.Autor,
+                    Estado = progreso?.Estado ?? EstadoLibro.SinLeer,
+                    Progreso = progreso?.TotalPaginas is > 0
+                        ? Math.Clamp((int)Math.Round(progreso.PaginaActual * 100.0 / progreso.TotalPaginas.Value), 0, 100)
+                        : 0,
+                    PortadaUrl = compartido.Libro.PortadaUrl is null
+                        ? null
+                        : await storageService.GetPortadaUrlAsync(compartido.Libro.PortadaUrl),
+                    CompartidoPorNombre = compartido.UsuarioQueComparte.Nombre,
                 });
             }
 

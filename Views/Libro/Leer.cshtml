@@ -1,0 +1,63 @@
+@model Lecturio.Models.Libros.LeerLibroViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.Titulo - Lecturio</title>
+    <link rel="stylesheet" href="~/css/reader.css" asp-append-version="true" />
+</head>
+<body>
+    <form id="antiforgeryForm" hidden>@Html.AntiForgeryToken()</form>
+
+    <div id="reader"
+         class="reader"
+         data-pdf-url="@Model.PdfUrl"
+         data-pdf-js="@Url.Content("~/lib/pdfjs/pdf.min.mjs")"
+         data-pdf-worker="@Url.Content("~/lib/pdfjs/pdf.worker.min.mjs")"
+         data-libro-id="@Model.Id"
+         data-pagina-inicial="@Model.PaginaInicial"
+         data-progreso-url="@Url.Action("ActualizarProgreso", "Libro")">
+
+        <header id="readerToolbar" class="reader-toolbar">
+            <div class="reader-toolbar-group">
+                <a asp-controller="Home" asp-action="Index" class="reader-btn reader-btn-icon" title="Volver a mi biblioteca" aria-label="Volver">&#8592;</a>
+                <div class="reader-title">
+                    <span class="reader-title-main">@Model.Titulo</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.Autor))
+                    {
+                        <span class="reader-title-sub">@Model.Autor</span>
+                    }
+                </div>
+            </div>
+
+            <div class="reader-toolbar-group reader-toolbar-center">
+                <button type="button" id="prevPage" class="reader-btn reader-btn-icon" title="Página anterior" aria-label="Página anterior">&#8249;</button>
+                <span class="reader-page-indicator">
+                    <span id="pageNum">1</span> / <span id="pageCount">&hellip;</span>
+                </span>
+                <button type="button" id="nextPage" class="reader-btn reader-btn-icon" title="Página siguiente" aria-label="Página siguiente">&#8250;</button>
+            </div>
+
+            <div class="reader-toolbar-group">
+                <button type="button" id="zoomOut" class="reader-btn reader-btn-icon" title="Alejar" aria-label="Alejar">&minus;</button>
+                <button type="button" id="zoomIn" class="reader-btn reader-btn-icon" title="Acercar" aria-label="Acercar">+</button>
+                <button type="button" id="fullscreenToggle" class="reader-btn reader-btn-icon" title="Pantalla completa" aria-label="Pantalla completa">&#9974;</button>
+            </div>
+        </header>
+
+        <main id="readerViewport" class="reader-viewport">
+            <div id="readerStatus" class="reader-status">Cargando documento&hellip;</div>
+            <canvas id="pdfCanvas" class="reader-canvas" hidden></canvas>
+
+            <button type="button" id="prevPageEdge" class="reader-edge-btn reader-edge-left" title="Página anterior" aria-label="Página anterior">&#8249;</button>
+            <button type="button" id="nextPageEdge" class="reader-edge-btn reader-edge-right" title="Página siguiente" aria-label="Página siguiente">&#8250;</button>
+        </main>
+    </div>
+
+    <script type="module" src="~/js/reader.js" asp-append-version="true"></script>
+</body>
+</html>

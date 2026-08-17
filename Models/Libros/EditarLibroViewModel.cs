@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Lecturio.Models.Libros;
 
-public class CrearLibroViewModel
+public class EditarLibroViewModel
 {
+    public Guid Id { get; set; }
+
     [Required(ErrorMessage = "El título es obligatorio.")]
     [Display(Name = "Título")]
     public string Titulo { get; set; } = string.Empty;
@@ -18,12 +20,10 @@ public class CrearLibroViewModel
     [Display(Name = "Presentación")]
     public Guid? PresentacionId { get; set; }
 
-    [Required(ErrorMessage = "Selecciona el archivo PDF del libro.")]
-    [Display(Name = "Archivo PDF")]
-    public IFormFile Pdf { get; set; } = null!;
-
     [Display(Name = "Portada")]
     public IFormFile? Portada { get; set; }
+
+    public string? PortadaUrlActual { get; set; }
 
     public List<SelectListItem> GenerosDisponibles { get; set; } = [];
     public List<SelectListItem> PresentacionesDisponibles { get; set; } = [];

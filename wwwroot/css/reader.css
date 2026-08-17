@@ -1,0 +1,190 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #202124;
+}
+
+.reader {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: #202124;
+}
+
+/* --- Toolbar: visible por defecto, se desvanece tras inactividad --- */
+.reader-toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+    color: #f1f3f4;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reader.controls-hidden .reader-toolbar {
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+}
+
+.reader-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.reader-toolbar-center {
+    flex: 0 0 auto;
+}
+
+.reader-title {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.reader-title-main {
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40vw;
+}
+
+.reader-title-sub {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 40vw;
+}
+
+.reader-btn {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.reader-btn-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.15rem;
+}
+
+.reader-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.reader-page-indicator {
+    font-size: 0.85rem;
+    min-width: 4.5rem;
+    text-align: center;
+    user-select: none;
+}
+
+/* --- Área de lectura --- */
+.reader-viewport {
+    position: relative;
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 4rem 1rem 2rem;
+}
+
+.reader-status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #f1f3f4;
+    font-size: 0.95rem;
+    opacity: 0.85;
+}
+
+.reader-status.reader-status-error {
+    color: #f28b82;
+    max-width: 28rem;
+    text-align: center;
+}
+
+.reader-canvas {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    background: #fff;
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- Flechas laterales: mismo comportamiento de auto-hide que la toolbar --- */
+.reader-edge-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.35);
+    color: #f1f3f4;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+}
+
+.reader-edge-btn:hover {
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.reader-edge-left {
+    left: 1rem;
+}
+
+.reader-edge-right {
+    right: 1rem;
+}
+
+.reader.controls-hidden .reader-edge-btn {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.reader-edge-btn:disabled,
+.reader-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.reader.controls-hidden {
+    cursor: none;
+}

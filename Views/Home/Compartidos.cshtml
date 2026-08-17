@@ -1,0 +1,73 @@
+@model List<Lecturio.Models.Libros.LibroResumenViewModel>
+@{
+    ViewData["Title"] = "Compartidos conmigo";
+    var coverClasses = new[] { "cover-1", "cover-2", "cover-3", "cover-4", "cover-5", "cover-6" };
+}
+
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+
+<div class="library-tabs">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-outline-secondary">Mis libros</a>
+    <a asp-controller="Home" asp-action="Compartidos" class="btn btn-sm btn-brand">Compartidos conmigo</a>
+</div>
+
+<div class="library-header">
+    <div>
+        <h1>Compartidos conmigo</h1>
+        <p>@Model.Count libro@(Model.Count == 1 ? "" : "s") que otros usuarios compartieron contigo</p>
+    </div>
+</div>
+
+@if (Model.Count > 0)
+{
+    <div class="library-toolbar">
+        <div class="library-search">
+            <input type="search" id="librarySearch" class="form-control" placeholder="Buscar por título o autor" />
+        </div>
+        <div class="library-filters">
+            <button type="button" class="btn btn-brand" data-estado-filter="Todos">Todos</button>
+            <button type="button" class="btn btn-outline-secondary" data-estado-filter="Sin leer">Sin leer</button>
+            <button type="button" class="btn btn-outline-secondary" data-estado-filter="Leyendo">Leyendo</button>
+            <button type="button" class="btn btn-outline-secondary" data-estado-filter="Leído">Leído</button>
+        </div>
+    </div>
+}
+
+@if (Model.Count == 0)
+{
+    <p class="text-muted">Todavía nadie ha compartido un libro contigo.</p>
+}
+else
+{
+    <div class="book-grid">
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var libro = Model[i];
+            <div class="book-card"
+                 data-estado="@libro.Estado"
+                 data-titulo="@libro.Titulo"
+                 data-autor="@(libro.Autor ?? "")">
+                <a asp-controller="Libro" asp-action="Leer" asp-route-id="@libro.Id" class="book-card-link text-decoration-none">
+                    <div class="book-cover @coverClasses[i % coverClasses.Length]" style="@(libro.PortadaUrl is not null ? $"background-image:url('{libro.PortadaUrl}');background-size:cover;background-position:center;" : "")">
+                        @if (libro.PortadaUrl is null)
+                        {
+                            @:📖
+                        }
+                        <span class="book-status">@libro.Estado</span>
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">@libro.Titulo</div>
+                        <div class="book-author">@(libro.Autor ?? "Autor desconocido")</div>
+                        <div class="book-progress"><span style="width:@(libro.Progreso)%"></span></div>
+                        <div class="book-progress-label">@libro.Progreso% completado</div>
+                        <div class="compartido-por">Compartido por @libro.CompartidoPorNombre</div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/library.js" asp-append-version="true"></script>
+}

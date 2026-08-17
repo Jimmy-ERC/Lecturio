@@ -15,6 +15,7 @@ public class LecturioDbContext(DbContextOptions<LecturioDbContext> options) : Db
     public DbSet<Libro> Libros => Set<Libro>();
     public DbSet<LibroGenero> LibrosGeneros => Set<LibroGenero>();
     public DbSet<Compartido> Compartidos => Set<Compartido>();
+    public DbSet<ProgresoLectura> ProgresosLectura => Set<ProgresoLectura>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,7 +25,9 @@ public class LecturioDbContext(DbContextOptions<LecturioDbContext> options) : Db
             e.HasKey(u => u.Id);
             e.Property(u => u.Id).HasColumnName("id").ValueGeneratedNever();
             e.Property(u => u.Nombre).HasColumnName("nombre").IsRequired();
+            e.Property(u => u.Email).HasColumnName("email");
             e.Property(u => u.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+            e.HasIndex(u => u.Email);
         });
 
         modelBuilder.Entity<Genero>(e =>
@@ -56,9 +59,6 @@ public class LecturioDbContext(DbContextOptions<LecturioDbContext> options) : Db
             e.Property(l => l.Autor).HasColumnName("autor");
             e.Property(l => l.PdfPath).HasColumnName("pdf_path").IsRequired();
             e.Property(l => l.PortadaUrl).HasColumnName("portada_url");
-            e.Property(l => l.PaginaActual).HasColumnName("pagina_actual").HasDefaultValue(0);
-            e.Property(l => l.TotalPaginas).HasColumnName("total_paginas");
-            e.Property(l => l.Estado).HasColumnName("estado").HasDefaultValue(EstadoLibro.SinLeer).IsRequired();
             e.Property(l => l.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
 
             e.HasOne(l => l.Usuario)
@@ -113,6 +113,27 @@ public class LecturioDbContext(DbContextOptions<LecturioDbContext> options) : Db
             e.HasOne(c => c.UsuarioDestinatario)
                 .WithMany(u => u.LibrosCompartidosConmigo)
                 .HasForeignKey(c => c.CompartidoCon)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ProgresoLectura>(e =>
+        {
+            e.ToTable("progreso_lectura");
+            e.HasKey(p => new { p.LibroId, p.UsuarioId });
+            e.Property(p => p.LibroId).HasColumnName("libro_id");
+            e.Property(p => p.UsuarioId).HasColumnName("usuario_id");
+            e.Property(p => p.PaginaActual).HasColumnName("pagina_actual").HasDefaultValue(0);
+            e.Property(p => p.TotalPaginas).HasColumnName("total_paginas");
+            e.Property(p => p.Estado).HasColumnName("estado").HasDefaultValue(EstadoLibro.SinLeer).IsRequired();
+
+            e.HasOne(p => p.Libro)
+                .WithMany(l => l.ProgresosLectura)
+                .HasForeignKey(p => p.LibroId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(p => p.Usuario)
+                .WithMany(u => u.ProgresosLectura)
+                .HasForeignKey(p => p.UsuarioId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

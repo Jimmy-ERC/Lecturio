@@ -49,9 +49,16 @@ public class AuthController(ISupabaseAuthService authService, LecturioDbContext 
             {
                 Id = result.UserId,
                 Nombre = result.Email,
+                Email = result.Email.ToLowerInvariant(),
                 CreatedAt = DateTimeOffset.UtcNow,
             };
             db.Usuarios.Add(usuario);
+            await db.SaveChangesAsync();
+        }
+        else if (!string.Equals(usuario.Email, result.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            // Mantiene el email espejado al día (necesario para poder compartir libros por correo).
+            usuario.Email = result.Email.ToLowerInvariant();
             await db.SaveChangesAsync();
         }
 
@@ -95,6 +102,7 @@ public class AuthController(ISupabaseAuthService authService, LecturioDbContext 
             {
                 Id = result.UserId,
                 Nombre = model.Nombre,
+                Email = model.Email.ToLowerInvariant(),
                 CreatedAt = DateTimeOffset.UtcNow,
             });
             await db.SaveChangesAsync();

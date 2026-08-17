@@ -6,6 +6,11 @@
 
 <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 
+<div class="library-tabs">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-brand">Mis libros</a>
+    <a asp-controller="Home" asp-action="Compartidos" class="btn btn-sm btn-outline-secondary">Compartidos conmigo</a>
+</div>
+
 <div class="library-header">
     <div>
         <h1>Mis libros</h1>
@@ -16,13 +21,13 @@
 
 <div class="library-toolbar">
     <div class="library-search">
-        <input type="search" class="form-control" placeholder="Buscar por título o autor" disabled />
+        <input type="search" id="librarySearch" class="form-control" placeholder="Buscar por título o autor" />
     </div>
     <div class="library-filters">
-        <button type="button" class="btn btn-brand">Todos</button>
-        <button type="button" class="btn btn-outline-secondary">Sin leer</button>
-        <button type="button" class="btn btn-outline-secondary">Leyendo</button>
-        <button type="button" class="btn btn-outline-secondary">Leído</button>
+        <button type="button" class="btn btn-brand" data-estado-filter="Todos">Todos</button>
+        <button type="button" class="btn btn-outline-secondary" data-estado-filter="Sin leer">Sin leer</button>
+        <button type="button" class="btn btn-outline-secondary" data-estado-filter="Leyendo">Leyendo</button>
+        <button type="button" class="btn btn-outline-secondary" data-estado-filter="Leído">Leído</button>
     </div>
 </div>
 
@@ -41,20 +46,38 @@ else
         @for (var i = 0; i < Model.Count; i++)
         {
             var libro = Model[i];
-            <div class="book-card">
-                <div class="book-cover @coverClasses[i % coverClasses.Length]" style="@(libro.PortadaUrl is not null ? $"background-image:url('{libro.PortadaUrl}');background-size:cover;background-position:center;" : "")">
-                    @if (libro.PortadaUrl is null)
-                    {
-                        @:📖
-                    }
-                    <span class="book-status">@libro.Estado</span>
+            <div class="book-card"
+                 data-estado="@libro.Estado"
+                 data-titulo="@libro.Titulo"
+                 data-autor="@(libro.Autor ?? "")">
+                <div class="dropdown book-card-menu">
+                    <button type="button" class="book-card-menu-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Opciones del libro">&#8942;</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" asp-controller="Libro" asp-action="Editar" asp-route-id="@libro.Id">Editar</a></li>
+                        <li><button type="button" class="dropdown-item share-libro-btn" data-libro-id="@libro.Id" data-titulo="@libro.Titulo">Compartir</button></li>
+                        <li>
+                            <form asp-controller="Libro" asp-action="Eliminar" asp-route-id="@libro.Id" method="post" class="delete-libro-form" data-titulo="@libro.Titulo">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item text-danger">Eliminar</button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
-                <div class="book-info">
-                    <div class="book-title">@libro.Titulo</div>
-                    <div class="book-author">@(libro.Autor ?? "Autor desconocido")</div>
-                    <div class="book-progress"><span style="width:@(libro.Progreso)%"></span></div>
-                    <div class="book-progress-label">@libro.Progreso% completado</div>
-                </div>
+                <a asp-controller="Libro" asp-action="Leer" asp-route-id="@libro.Id" class="book-card-link text-decoration-none">
+                    <div class="book-cover @coverClasses[i % coverClasses.Length]" style="@(libro.PortadaUrl is not null ? $"background-image:url('{libro.PortadaUrl}');background-size:cover;background-position:center;" : "")">
+                        @if (libro.PortadaUrl is null)
+                        {
+                            @:📖
+                        }
+                        <span class="book-status">@libro.Estado</span>
+                    </div>
+                    <div class="book-info">
+                        <div class="book-title">@libro.Titulo</div>
+                        <div class="book-author">@(libro.Autor ?? "Autor desconocido")</div>
+                        <div class="book-progress"><span style="width:@(libro.Progreso)%"></span></div>
+                        <div class="book-progress-label">@libro.Progreso% completado</div>
+                    </div>
+                </a>
             </div>
         }
 
@@ -63,4 +86,49 @@ else
             <span>Agregar un libro nuevo</span>
         </a>
     </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Eliminar libro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Eliminar «<span id="confirmDeleteTitulo"></span>»? Esta acción no se puede deshacer.
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-brand">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form asp-controller="Libro" asp-action="Compartir" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="shareLibroId" />
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="shareModalLabel">Compartir «<span id="shareLibroTitulo"></span>»</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="shareEmail" class="form-label">Correo de un usuario registrado en Lecturio</label>
+                        <input type="email" name="email" id="shareEmail" class="form-control" placeholder="correo@ejemplo.com" required />
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-brand">Compartir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/library.js" asp-append-version="true"></script>
 }
