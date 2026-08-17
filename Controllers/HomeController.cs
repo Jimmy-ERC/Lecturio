@@ -19,6 +19,8 @@ namespace Lecturio.Controllers
 
             var libros = await db.Libros
                 .Where(l => l.UsuarioId == usuarioId)
+                .Include(l => l.Presentacion)
+                .Include(l => l.LibrosGeneros).ThenInclude(lg => lg.Genero)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
@@ -43,6 +45,8 @@ namespace Lecturio.Controllers
                     PortadaUrl = libro.PortadaUrl is null
                         ? null
                         : await storageService.GetPortadaUrlAsync(libro.PortadaUrl),
+                    Presentacion = libro.Presentacion?.Nombre,
+                    Generos = libro.LibrosGeneros.Select(lg => lg.Genero.Nombre).OrderBy(n => n).ToList(),
                 });
             }
 
@@ -55,7 +59,8 @@ namespace Lecturio.Controllers
 
             var compartidos = await db.Compartidos
                 .Where(c => c.CompartidoCon == usuarioId)
-                .Include(c => c.Libro)
+                .Include(c => c.Libro).ThenInclude(l => l.Presentacion)
+                .Include(c => c.Libro).ThenInclude(l => l.LibrosGeneros).ThenInclude(lg => lg.Genero)
                 .Include(c => c.UsuarioQueComparte)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
@@ -82,6 +87,8 @@ namespace Lecturio.Controllers
                     PortadaUrl = compartido.Libro.PortadaUrl is null
                         ? null
                         : await storageService.GetPortadaUrlAsync(compartido.Libro.PortadaUrl),
+                    Presentacion = compartido.Libro.Presentacion?.Nombre,
+                    Generos = compartido.Libro.LibrosGeneros.Select(lg => lg.Genero.Nombre).OrderBy(n => n).ToList(),
                     CompartidoPorNombre = compartido.UsuarioQueComparte.Nombre,
                 });
             }

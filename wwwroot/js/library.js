@@ -1,22 +1,31 @@
 (function () {
     const searchInput = document.getElementById("librarySearch");
     const filterButtons = document.querySelectorAll("[data-estado-filter]");
+    const generoFilter = document.getElementById("libraryGeneroFilter");
+    const presentacionFilter = document.getElementById("libraryPresentacionFilter");
     const cards = document.querySelectorAll(".book-card[data-estado]");
 
     let activeEstado = "Todos";
 
     function applyFilters() {
         const query = (searchInput?.value ?? "").trim().toLowerCase();
+        const genero = generoFilter?.value ?? "";
+        const presentacion = presentacionFilter?.value ?? "";
 
         cards.forEach((card) => {
             const matchesEstado = activeEstado === "Todos" || card.dataset.estado === activeEstado;
             const haystack = `${card.dataset.titulo ?? ""} ${card.dataset.autor ?? ""}`.toLowerCase();
             const matchesQuery = query === "" || haystack.includes(query);
-            card.style.display = matchesEstado && matchesQuery ? "" : "none";
+            const generos = (card.dataset.generos ?? "").split("||").filter(Boolean);
+            const matchesGenero = genero === "" || generos.includes(genero);
+            const matchesPresentacion = presentacion === "" || card.dataset.presentacion === presentacion;
+            card.style.display = matchesEstado && matchesQuery && matchesGenero && matchesPresentacion ? "" : "none";
         });
     }
 
     searchInput?.addEventListener("input", applyFilters);
+    generoFilter?.addEventListener("change", applyFilters);
+    presentacionFilter?.addEventListener("change", applyFilters);
 
     filterButtons.forEach((btn) => {
         btn.addEventListener("click", () => {

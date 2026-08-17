@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Mis libros";
     var coverClasses = new[] { "cover-1", "cover-2", "cover-3", "cover-4", "cover-5", "cover-6" };
+    var generosDisponibles = Model.SelectMany(m => m.Generos).Distinct().OrderBy(g => g).ToList();
+    var presentacionesDisponibles = Model.Where(m => m.Presentacion is not null).Select(m => m.Presentacion!).Distinct().OrderBy(p => p).ToList();
 }
 
 <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
@@ -28,6 +30,20 @@
         <button type="button" class="btn btn-outline-secondary" data-estado-filter="Sin leer">Sin leer</button>
         <button type="button" class="btn btn-outline-secondary" data-estado-filter="Leyendo">Leyendo</button>
         <button type="button" class="btn btn-outline-secondary" data-estado-filter="Leído">Leído</button>
+        <select id="libraryGeneroFilter" class="form-select form-select-sm library-select-filter" aria-label="Filtrar por género">
+            <option value="">Todos los géneros</option>
+            @foreach (var genero in generosDisponibles)
+            {
+                <option value="@genero">@genero</option>
+            }
+        </select>
+        <select id="libraryPresentacionFilter" class="form-select form-select-sm library-select-filter" aria-label="Filtrar por presentación">
+            <option value="">Todas las presentaciones</option>
+            @foreach (var presentacion in presentacionesDisponibles)
+            {
+                <option value="@presentacion">@presentacion</option>
+            }
+        </select>
     </div>
 </div>
 
@@ -49,7 +65,9 @@ else
             <div class="book-card"
                  data-estado="@libro.Estado"
                  data-titulo="@libro.Titulo"
-                 data-autor="@(libro.Autor ?? "")">
+                 data-autor="@(libro.Autor ?? "")"
+                 data-generos="@string.Join("||", libro.Generos)"
+                 data-presentacion="@(libro.Presentacion ?? "")">
                 <div class="dropdown book-card-menu">
                     <button type="button" class="book-card-menu-btn" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Opciones del libro">&#8942;</button>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -74,6 +92,10 @@ else
                     <div class="book-info">
                         <div class="book-title">@libro.Titulo</div>
                         <div class="book-author">@(libro.Autor ?? "Autor desconocido")</div>
+                        @if (libro.Presentacion is not null)
+                        {
+                            <div class="book-presentacion">@libro.Presentacion</div>
+                        }
                         <div class="book-progress"><span style="width:@(libro.Progreso)%"></span></div>
                         <div class="book-progress-label">@libro.Progreso% completado</div>
                     </div>

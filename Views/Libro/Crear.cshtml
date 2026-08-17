@@ -4,6 +4,7 @@
 }
 
 <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/genero-picker.css" asp-append-version="true" />
 
 <div class="form-card">
     <h1>Agregar libro</h1>
@@ -25,8 +26,8 @@
 
         <div class="mb-3">
             <label asp-for="GeneroIds" class="form-label"></label>
-            <select asp-for="GeneroIds" asp-items="Model.GenerosDisponibles" class="form-select" multiple size="6"></select>
-            <div class="form-text">Mantén Ctrl (o Cmd) presionado para seleccionar varios géneros.</div>
+            <select asp-for="GeneroIds" asp-items="Model.GenerosDisponibles" class="form-select js-genero-picker" multiple></select>
+            <div class="form-text">Puedes seleccionar varios géneros.</div>
             <span asp-validation-for="GeneroIds" class="text-danger small"></span>
         </div>
 
@@ -60,4 +61,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/genero-picker.js" asp-append-version="true"></script>
 }
